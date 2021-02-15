@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Validator;
 
 class PostController extends Controller
 {
@@ -14,7 +17,15 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::latest()
+            ->when(request()->search, function ($query) {
+                $query->where('title', 'like', '%' . request()->search . '%');
+            })
+            ->paginate(10);
+
+        return view('posts.index', [
+            'posts' => $posts
+        ]);
     }
 
     /**
@@ -24,7 +35,10 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create', [
+            'postOption' => Post::option(),
+            'post' => new Post(),
+        ]);
     }
 
     /**
@@ -35,7 +49,24 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'body' => 'required|string|min:3',
+            'status' => 'required|in:published,draft',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->with('toast_error', $validator->messages()->all()[0])->withInput();
+        }
+
+        Auth::user()->posts()->create([
+            'title' => $request->title,
+            'slug' => Str::slug($request->title . '-' . Str::random(6)),
+            'body' => $request->body,
+            'status' => $request->status,
+        ]);
+
+        return redirect(route('posts.index'))->with('success', 'Your Post has been submited!');
     }
 
     /**
@@ -46,7 +77,9 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('posts.show', [
+            'post' => $post
+        ]);
     }
 
     /**
@@ -57,7 +90,10 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('posts.edit', [
+            'postOption' => Post::option(),
+            'post' => $post,
+        ]);
     }
 
     /**
@@ -69,7 +105,24 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'body' => 'required|string|min:3',
+            'status' => 'required|in:published,draft',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->with('toast_error', $validator->messages()->all()[0])->withInput();
+        }
+
+        $post->update([
+            'title' => $request->title,
+            'slug' => Str::slug($request->title . '-' . Str::random(6)),
+            'body' => $request->body,
+            'status' => $request->status,
+        ]);
+
+        return redirect(route('posts.index'))->with('success', 'Post has been updated!');;
     }
 
     /**
@@ -80,6 +133,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+
+        return back()->with('toast_success', 'Post has been deleted!');
     }
 }

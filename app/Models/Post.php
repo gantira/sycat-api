@@ -19,6 +19,14 @@ class Post extends Model
         'status',
     ];
 
+    public function scopeOption()
+    {
+        return [
+            'published' => ['published'],
+            'draft' => ['draft'],
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
