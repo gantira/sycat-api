@@ -10,7 +10,7 @@
 
 <label class="block mb-3">
     <span class="text-gray-700">Body</span>
-    <x-textarea name="body" id="sample" class="">{!! old('body') ?? $post->body !!}</x-textarea>
+    <x-textarea name="body" id="sample">{!! old('body') ?? $post->body !!}</x-textarea>
     @error('body')
     <span class="text-sm text-red-600">{{ $message }}</span>
     @enderror
