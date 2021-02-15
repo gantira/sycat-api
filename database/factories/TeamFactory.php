@@ -22,7 +22,7 @@ class TeamFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->unique()->randomElement(['DCO', 'HCM', 'TMO', 'HR']),
         ];
     }
 }
