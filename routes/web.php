@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{PostController, TeamController};
+use App\Http\Controllers\{PostController, TagController, TeamController};
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +37,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('{team}/edit', [TeamController::class, 'edit'])->name('edit');
         Route::put('{team}/edit', [TeamController::class, 'update'])->name('update');
         Route::delete('{team}', [TeamController::class, 'destroy'])->name('delete');
+    });
+
+    Route::prefix('tags')->name('tags.')->group(function () {
+        Route::get('', [TagController::class, 'index'])->name('index');
+        Route::get('create', [TagController::class, 'create'])->name('create');
+        Route::post('create', [TagController::class, 'store'])->name('store');
+        Route::get('{tag}/edit', [TagController::class, 'edit'])->name('edit');
+        Route::put('{tag}/edit', [TagController::class, 'update'])->name('update');
+        Route::delete('{tag}', [TagController::class, 'destroy'])->name('delete');
     });
 
 });
